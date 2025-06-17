@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCMSCO Graduation - Ticket Seating System</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: rgb(0, 51, 102);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .control-panel {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        .form-group label {
+            width: auto;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 80px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .theater {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .screen {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .seats {
+            display: inline-block;
+        }
+        .row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5px;
+        }
+        .seat {
+            width: 30px;
+            height: 30px;
+            margin: 0 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+        .available {
+            background-color: #e0e0e0;
+            color: black;
+            cursor: pointer;
+        }
+        .aisle {
+            background-color: transparent;
+            width: 40px;
+        }
+        .group-controls {
+            margin-top: 20px;
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .ticket-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 0;
+        }
+        .ticket-option {
+            display: flex;
+            align-items: center;
+        }
+        .ticket-option input {
+            margin-right: 5px;
+        }
+        .add-group-btn {
+            background-color: #2196F3;
+        }
+        .export-btn {
+            background-color: #9C27B0;
+        }
+        .randomize-btn {
+            background-color: #FF9800;
+        }
+        .reset-btn {
+            background-color: #f44336;
+        }
+        .group-info {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .group-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .group-item {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+        }
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+        .footer {
+            margin-top: 30px;
+            padding: 15px;
+            text-align: center;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            color: gray;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .control-panel, .group-controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .form-group {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .ticket-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PCMSCO Graduation - Ticket Seating System</h1>
+        
+        <div class="control-panel">
+            <div class="form-group">
+                <label for="rows">Rows:</label>
+                <input type="number" id="rows" min="1" max="50" value="12">
+            </div>
+            <div class="form-group">
+                <label for="seatsPerRow">Seats per row:</label>
+                <input type="number" id="seatsPerRow" min="1" max="50" value="9">
+            </div>
+            <div class="form-group">
+                <label for="aisleCount">Aisles:</label>
+                <select id="aisleCount">
+                    <option value="0">0 aisles</option>
+                    <option value="1">1 aisle</option>
+                    <option value="2">2 aisles</option>
+                </select>
+            </div>
+            
+            <button id="generateBtn">Generate Seats</button>
+            <button id="randomizeBtn" class="randomize-btn">Random Assign</button>
+            <button id="resetBtn" class="reset-btn">Reset</button>
+            <button id="exportBtn" class="export-btn">Export Screenshot</button>
+        </div>
+        
+        <div class="group-controls">
+            <h3 style="margin: 0; width: 100%;">Add Group</h3>
+            <div class="ticket-options">
+                <div class="ticket-option">
+                    <input type="radio" id="ticket1" name="tickets" value="1" checked>
+                    <label for="ticket1">1 person</label>
+                </div>
+                <div class="ticket-option">
+                    <input type="radio" id="ticket2" name="tickets" value="2">
+                    <label for="ticket2">2 people</label>
+                </div>
+                <div class="ticket-option">
+                    <input type="radio" id="ticket3" name="tickets" value="3">
+                    <label for="ticket3">3 people</label>
+                </div>
+                <div class="ticket-option">
+                    <input type="radio" id="ticket4" name="tickets" value="4">
+                    <label for="ticket4">4 people</label>
+                </div>
+            </div>
+            <button id="addGroupBtn" class="add-group-btn">Add Group</button>
+        </div>
+        
+        <div class="theater">
+            <div class="screen">Stage</div>
+            <div class="seats" id="seatsContainer"></div>
+        </div>
+        
+        <div class="legend" id="legendContainer"></div>
+        
+        <div class="group-info">
+            <h3>Group Information</h3>
+            <div id="groupCount">Total Groups: 0</div>
+            <div id="seatCount">Assigned Seats: 0 / Total Seats: 0</div>
+            <div class="group-list" id="groupList"></div>
+        </div>
+
+        <div class="footer">
+            Copyright © Pui Ching Middle School 2025. All Rights Reserved.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generateBtn');
+            const randomizeBtn = document.getElementById('randomizeBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const addGroupBtn = document.getElementById('addGroupBtn');
+            const seatsContainer = document.getElementById('seatsContainer');
+            const groupCount = document.getElementById('groupCount');
+            const seatCount = document.getElementById('seatCount');
+            const groupList = document.getElementById('groupList');
+            const legendContainer = document.getElementById('legendContainer');
+            const aisleCountSelect = document.getElementById('aisleCount');
+            
+            let seats = [];
+            let groups = [];
+            let occupiedSeats = 0;
+            let totalSeats = 0;
+            let nextGroupId = 1;
+            let aislePositions = [];
+            let sections = [];
+            
+            // Color list (enough for 32 groups)
+            const groupColors = [
+                '#FF5252', '#FF4081', '#E040FB', '#7C4DFF', '#536DFE', 
+                '#448AFF', '#40C4FF', '#18FFFF', '#64FFDA', '#69F0AE', 
+                '#B2FF59', '#EEFF41', '#FFFF00', '#FFD740', '#FFAB40', 
+                '#FF6E40', '#FF5722', '#795548', '#9E9E9E', '#607D8B',
+                '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+                '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+                '#8BC34A', '#CDDC39'
+            ];
+            
+            // Generate seating chart
+            generateBtn.addEventListener('click', generateSeats);
+            
+            // Random seat assignment
+            randomizeBtn.addEventListener('click', randomizeSeats);
+            
+            // Reset
+            resetBtn.addEventListener('click', resetAll);
+            
+            // Add group
+            addGroupBtn.addEventListener('click', addGroup);
+            
+            // Export screenshot
+            exportBtn.addEventListener('click', exportScreenshot);
+            
+            function generateSeats() {
+                const rows = parseInt(document.getElementById('rows').value);
+                const seatsPerRow = parseInt(document.getElementById('seatsPerRow').value);
+                const aisleCount = parseInt(aisleCountSelect.value);
+                
+                // Calculate aisle positions
+                aislePositions = [];
+                sections = [];
+                if (aisleCount === 1) {
+                    aislePositions.push(Math.ceil(seatsPerRow / 2));
+                    sections = [
+                        { start: 0, end: aislePositions[0] - 1 },
+                        { start: aislePositions[0], end: seatsPerRow - 1 }
+                    ];
+                } else if (aisleCount === 2) {
+                    const sectionSize = Math.ceil(seatsPerRow / 3);
+                    aislePositions.push(sectionSize);
+                    aislePositions.push(sectionSize * 2);
+                    sections = [
+                        { start: 0, end: aislePositions[0] - 1 },
+                        { start: aislePositions[0], end: aislePositions[1] - 1 },
+                        { start: aislePositions[1], end: seatsPerRow - 1 }
+                    ];
+                } else {
+                    sections = [
+                        { start: 0, end: seatsPerRow - 1 }
+                    ];
+                }
+                
+                seatsContainer.innerHTML = '';
+                seats = [];
+                groups = [];
+                occupiedSeats = 0;
+                totalSeats = rows * (seatsPerRow - aisleCount); // Subtract aisle positions
+                nextGroupId = 1;
+                
+                for (let row = 0; row < rows; row++) {
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'row';
+                    
+                    const rowSeats = [];
+                    let seatNumber = 0;
+                    
+                    for (let seat = 0; seat < seatsPerRow; seat++) {
+                        // Check if this is an aisle position
+                        if (aislePositions.includes(seat + 1)) {
+                            const aisleDiv = document.createElement('div');
+                            aisleDiv.className = 'aisle';
+                            rowDiv.appendChild(aisleDiv);
+                            continue;
+                        }
+                        
+                        seatNumber++;
+                        const seatDiv = document.createElement('div');
+                        seatDiv.className = 'seat available';
+                        seatDiv.dataset.row = row;
+                        seatDiv.dataset.seat = seat;
+                        seatDiv.textContent = `${String.fromCharCode(65 + row)}${seatNumber}`;
+                        rowDiv.appendChild(seatDiv);
+                        
+                        rowSeats.push({
+                            row: row,
+                            seat: seat,
+                            seatNumber: seatNumber,
+                            element: seatDiv,
+                            group: null,
+                            section: getSeatSection(seat)
+                        });
+                    }
+                    
+                    seatsContainer.appendChild(rowDiv);
+                    seats.push(rowSeats);
+                }
+                
+                updateCounters();
+                updateGroupList();
+                updateLegend();
+            }
+            
+            function getSeatSection(seatIndex) {
+                for (let i = 0; i < sections.length; i++) {
+                    if (seatIndex >= sections[i].start && seatIndex <= sections[i].end) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+            
+            function addGroup() {
+                const tickets = parseInt(document.querySelector('input[name="tickets"]:checked').value);
+                
+                groups.push({
+                    id: nextGroupId,
+                    tickets: tickets,
+                    seats: [],
+                    color: groupColors[(nextGroupId - 1) % groupColors.length]
+                });
+                
+                nextGroupId++;
+                updateCounters();
+                updateGroupList();
+                updateLegend();
+            }
+            
+            function randomizeSeats() {
+                if (seats.length === 0) {
+                    alert('Please generate seating chart first');
+                    return;
+                }
+                
+                if (groups.length === 0) {
+                    alert('Please add at least one group');
+                    return;
+                }
+                
+                // Clear existing assignments
+                resetAllocations();
+                
+                // Shuffle group order
+                shuffleArray(groups);
+                
+                // Collect all available seats
+                let allAvailableSeats = [];
+                for (const row of seats) {
+                    for (const seat of row) {
+                        if (seat.group === null) {
+                            allAvailableSeats.push(seat);
+                        }
+                    }
+                }
+                
+                // Sort seats by row and section to assign from front
+                allAvailableSeats.sort((a, b) => {
+                    if (a.row !== b.row) return a.row - b.row;
+                    return a.section - b.section;
+                });
+                
+                // Assign seats
+                for (const group of groups) {
+                    if (allAvailableSeats.length < group.tickets) {
+                        alert(`Not enough seats for group ${group.id}`);
+                        break;
+                    }
+                    
+                    // Try to find consecutive seats
+                    let consecutiveSeats = null;
+                    
+                    // Try from front rows first
+                    for (let i = 0; i <= allAvailableSeats.length - group.tickets; i++) {
+                        const testSeat = allAvailableSeats[i];
+                        consecutiveSeats = findConsecutiveSeatsInSection(testSeat, group.tickets, allAvailableSeats);
+                        if (consecutiveSeats) {
+                            break;
+                        }
+                    }
+                    
+                    if (!consecutiveSeats) {
+                        // If no consecutive seats found, try other seats
+                        for (let i = 0; i < allAvailableSeats.length; i++) {
+                            const testSeat = allAvailableSeats[i];
+                            consecutiveSeats = findConsecutiveSeatsInSection(testSeat, group.tickets, allAvailableSeats);
+                            if (consecutiveSeats) {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!consecutiveSeats) {
+                        alert(`Cannot find consecutive seats for group ${group.id}`);
+                        continue;
+                    }
+                    
+                    // Assign seats to group
+                    group.seats = consecutiveSeats;
+                    for (const seat of consecutiveSeats) {
+                        seat.group = group.id;
+                        seat.element.className = 'seat';
+                        seat.element.style.backgroundColor = group.color;
+                        seat.element.title = `Group ${group.id} (${group.tickets} people)`;
+                        
+                        // Remove from available seats
+                        const index = allAvailableSeats.findIndex(s => 
+                            s.row === seat.row && s.seat === seat.seat);
+                        if (index !== -1) {
+                            allAvailableSeats.splice(index, 1);
+                        }
+                    }
+                    
+                    occupiedSeats += group.tickets;
+                }
+                
+                updateCounters();
+                updateGroupList();
+            }
+            
+            function findConsecutiveSeatsInSection(startSeat, count, availableSeats) {
+                const row = startSeat.row;
+                const section = startSeat.section;
+                const rowSeats = seats[row];
+                
+                // Find seats in same row and section
+                const sectionSeats = rowSeats.filter(seat => 
+                    seat.section === section && availableSeats.includes(seat));
+                
+                // Try to find consecutive seats
+                for (let i = 0; i <= sectionSeats.length - count; i++) {
+                    const consecutiveSeats = sectionSeats.slice(i, i + count);
+                    
+                    // Check if seats are consecutive
+                    let isConsecutive = true;
+                    for (let j = 1; j < consecutiveSeats.length; j++) {
+                        if (consecutiveSeats[j].seat !== consecutiveSeats[j-1].seat + 1) {
+                            isConsecutive = false;
+                            break;
+                        }
+                    }
+                    
+                    if (isConsecutive) {
+                        return consecutiveSeats;
+                    }
+                }
+                
+                return null;
+            }
+            
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+            
+            function resetAllocations() {
+                if (seats.length === 0) return;
+                
+                for (const row of seats) {
+                    for (const seat of row) {
+                        seat.group = null;
+                        seat.element.className = 'seat available';
+                        seat.element.style.backgroundColor = '';
+                        seat.element.title = '';
+                    }
+                }
+                
+                occupiedSeats = 0;
+                updateCounters();
+            }
+            
+            function resetAll() {
+                seats = [];
+                groups = [];
+                occupiedSeats = 0;
+                totalSeats = 0;
+                nextGroupId = 1;
+                seatsContainer.innerHTML = '';
+                groupList.innerHTML = '';
+                legendContainer.innerHTML = '';
+                updateCounters();
+            }
+            
+            function updateCounters() {
+                groupCount.textContent = `Total Groups: ${groups.length}`;
+                seatCount.textContent = `Assigned Seats: ${occupiedSeats} / Total Seats: ${totalSeats}`;
+            }
+            
+            function updateGroupList() {
+                groupList.innerHTML = '';
+                
+                for (const group of groups) {
+                    const groupItem = document.createElement('div');
+                    groupItem.className = 'group-item';
+                    groupItem.style.backgroundColor = group.color;
+                    
+                    if (group.seats.length > 0) {
+                        groupItem.textContent = `Group ${group.id}: ${group.tickets} people (${group.seats.map(s => 
+                            `${String.fromCharCode(65 + s.row)}${s.seatNumber}`).join(', ')})`;
+                    } else {
+                        groupItem.textContent = `Group ${group.id}: ${group.tickets} people (not assigned)`;
+                    }
+                    
+                    groupList.appendChild(groupItem);
+                }
+            }
+            
+            function updateLegend() {
+                legendContainer.innerHTML = '';
+                
+                for (const group of groups) {
+                    const legendItem = document.createElement('div');
+                    legendItem.className = 'legend-item';
+                    
+                    const colorBox = document.createElement('div');
+                    colorBox.className = 'legend-color';
+                    colorBox.style.backgroundColor = group.color;
+                    
+                    const label = document.createElement('span');
+                    label.textContent = `Group ${group.id}`;
+                    
+                    legendItem.appendChild(colorBox);
+                    legendItem.appendChild(label);
+                    legendContainer.appendChild(legendItem);
+                }
+            }
+            
+            function exportScreenshot() {
+                // Create export div
+                const exportDiv = document.createElement('div');
+                exportDiv.style.padding = '20px';
+                exportDiv.style.background = 'white';
+                exportDiv.style.borderRadius = '8px';
+                exportDiv.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                exportDiv.style.maxWidth = '1200px';
+                exportDiv.style.margin = '0 auto';
+                
+                // Add title
+                const title = document.createElement('h1');
+                title.textContent = 'PCMSCO Graduation Seating Chart';
+                title.style.textAlign = 'center';
+                title.style.marginBottom = '20px';
+                exportDiv.appendChild(title);
+                
+                // Add date time
+                const now = new Date();
+                const dateStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+                const dateElement = document.createElement('div');
+                dateElement.textContent = 'Generated: ' + dateStr;
+                dateElement.style.textAlign = 'center';
+                dateElement.style.marginBottom = '20px';
+                exportDiv.appendChild(dateElement);
+                
+                // Add theater and seats
+                const theaterClone = document.querySelector('.theater').cloneNode(true);
+                exportDiv.appendChild(theaterClone);
+                
+                // Add legend
+                const legendClone = document.querySelector('.legend').cloneNode(true);
+                exportDiv.appendChild(legendClone);
+                
+                // Add group info
+                const groupInfoClone = document.querySelector('.group-info').cloneNode(true);
+                exportDiv.appendChild(groupInfoClone);
+                
+                // Temporarily add to body
+                document.body.appendChild(exportDiv);
+                
+                // Generate screenshot
+                html2canvas(exportDiv, {
+                    scale: 2,
+                    logging: false,
+                    useCORS: true,
+                    allowTaint: true
+                }).then(canvas => {
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = 'PCMSCO_Seating_Chart_' + now.getTime() + '.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    // Remove temporary div
+                    document.body.removeChild(exportDiv);
+                });
+            }
+            
+            // Initial seat generation
+            generateSeats();
+        });
+    </script>
+</body>
+</html>
