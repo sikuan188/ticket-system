@@ -6,6 +6,19 @@
     <title>PCMSCO Graduation - Ticket Seating System</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
+                .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .logo {
+            height: 50px;
+            width: 50px;
+            margin-right: 15px;
+            object-fit: contain; /* 保持图片比例 */
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -204,9 +217,13 @@
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div class="header">
+        <img src="pcmsco_logo.jpeg" alt="PCMSCO Logo" class="logo">
         <h1>PCMSCO Graduation - Ticket Seating System</h1>
-        
+    </div>
+
+    <div class="container">
         <div class="control-panel">
             <div class="form-group">
                 <label for="rows">Rows:</label>
